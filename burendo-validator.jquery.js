@@ -191,7 +191,7 @@
 		},
 		elements = ['input', 'textarea', 'select', 'radio', 'checkbox'];
 
-	$.fn.validatize = function(opt) {
+	$.fn.validate = function(opt) {
 		var form = this,
 			is_legal = true;
 
