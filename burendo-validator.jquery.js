@@ -193,8 +193,7 @@
 
 	$.fn.validate = function(opt) {
 		var form = this,
-			is_legal = true,
-			duration = 280;
+			is_legal = true;
 
 		$.extend(params, opt);
 		form.filter('form').submit(function(e) {
@@ -213,17 +212,19 @@
 
 					if (validator !== null) {
 						if (selector.is('[required]') && !validator.checkEmpty()) {
+							selector.blur();
 							selector.off().on('focus', function(e) {
 								selector.val(value);
-								selector.animate(css, duration);
+								selector.css(css);
 							});
 							is_legal = false;
 						}
 
 						if (!validator.checkFormat()) {
+							selector.blur();
 							selector.off().on('focus', function(e) {
 								selector.val(value);
-								selector.animate(css, duration);
+								selector.css(css);
 							});
 							is_legal = false;
 						}
