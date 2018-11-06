@@ -198,7 +198,9 @@
 		$.extend(params, opt);
 		form.filter('form').submit(function(e) {
 			e.preventDefault();
-			is_legal = true;
+			if (is_legal == false) {
+				return false;
+			}
 			form.find(elements.join(',')).each(function() {
 				var selector = $(this),
 					value = selector.val(),
@@ -214,6 +216,7 @@
 						if (selector.is('[required]') && !validator.checkEmpty()) {
 							selector.blur();
 							selector.off().on('focus', function(e) {
+								is_legal = true;
 								selector.val(value);
 								selector.css(css);
 							});
@@ -223,6 +226,7 @@
 						if (!validator.checkFormat()) {
 							selector.blur();
 							selector.off().on('focus', function(e) {
+								is_legal = true;
 								selector.val(value);
 								selector.css(css);
 							});
