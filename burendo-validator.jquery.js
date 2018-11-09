@@ -20,6 +20,10 @@
 				return false;
 			},
 			message: function(message) {
+				if (selector.attr('type') == 'password') {
+					selector.attr('type', 'text');
+					selector.attr('orig_type', 'password');
+				}
 				selector.css(params.message.style);
 				selector.val(message);
 			},
@@ -51,18 +55,19 @@
 				checkFormat: function() {
 					var check_items = selector.data('check-item'),
 	                                    is_legal = true, pattern, message;
+
 					if (selector.attr('type') !== undefined) {
-                                            pattern = params.format[selector.attr('type')];
-                                            message = params.message.format[selector.attr('type')];
-                                        }
-                                        
-                                        if (selector.data('check-item') !== undefined) {
-                          		    var type = selector.data('check-item').replace(/ /g, '');
-                                            pattern = params.format[type];
-                                            message = params.message.format[type];
-                                        }
-                                         
-				        if (pattern instanceof RegExp && message !== undefined) {
+                        pattern = params.format[selector.attr('type')];
+                        message = params.message.format[selector.attr('type')];
+                    }
+                        
+                    if (selector.data('check-item') !== undefined) {
+      		    		var type = selector.data('check-item').replace(/ /g, '');
+                        pattern = params.format[type];
+                        message = params.message.format[type];
+                    }
+                                     
+			        if (pattern instanceof RegExp && message !== undefined) {
 					    if (!Valid.checkFormat(pattern, message)) {
 							is_legal = false;
 					    }
@@ -195,12 +200,24 @@
 		var form = this,
 			is_legal = true;
 
-		$.extend(params, opt);
+		if (typeof opt.format === 'object') {
+			$.extend(params.format, opt.format);
+		}
+
+		if (typeof opt.message.required == 'string') {
+			params.message.required = opt.message.required;
+		}
+
+		if (typeof opt.message.format === 'object') {
+			$.extend(params.message.format, opt.message.format);
+		}
+
+		if (typeof opt.message.style === 'object') {
+			$.extend(params.message.style, opt.message.style);
+		}
+
 		form.filter('form').submit(function(e) {
 			e.preventDefault();
-			if (is_legal == false) {
-				return false;
-			}
 			form.find(elements.join(',')).each(function() {
 				var selector = $(this),
 					value = selector.val(),
@@ -212,27 +229,39 @@
 						borderColor: selector.css('borderColor')
 					};
 
-					if (validator !== null) {
-						if (selector.is('[required]') && !validator.checkEmpty()) {
-							selector.blur();
-							selector.off().on('focus', function(e) {
-								is_legal = true;
-								selector.val(value);
-								selector.css(css);
-							});
-							is_legal = false;
-						}
-
-						if (!validator.checkFormat()) {
-							selector.blur();
-							selector.off().on('focus', function(e) {
-								is_legal = true;
-								selector.val(value);
-								selector.css(css);
-							});
-							is_legal = false;
-						}
+				if (validator !== null) {
+					if (selector.is('[required]') && !validator.checkEmpty()) {
+						selector.blur();
+						selector.off().on('focus', function(e) {
+							if (selector.attr('orig_type') == 'password') {
+								selector.attr('type', 'password');
+								selector.removeAttr('orig_type');
+							}
+							selector.data('is_legal', true);
+							selector.val(value);
+							selector.css(css);
+						});
+						selector.data('is_legal', false);
 					}
+
+					if (!validator.checkFormat()) {
+						selector.blur();
+						selector.off().on('focus', function(e) {
+							if (selector.attr('orig_type') == 'password') {
+								selector.attr('type', 'password');
+								selector.removeAttr('orig_type');
+							}
+							selector.data('is_legal', true);
+							selector.val(value);
+							selector.css(css);
+						});
+						selector.data('is_legal', false);
+					}
+				}
+
+				if (selector.data('is_legal') == false) {
+					is_legal = false;
+				}
 			});
 
 			if (!is_legal) {
