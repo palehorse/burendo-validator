@@ -5,101 +5,253 @@
 		factory(jQuery);
 	}
 })(function( $ ) {
-	function Validate(selector) {
-		this.selector = selector;
+	function Validator(selector) {
+		var style = selector.data('orig_css');
 
 		return {
 			empty: function() {
-				return (selector.val()) ? false: true;
+				if (!selector.is('[required]')) {
+					return false;
+				}
+				var value = typeof selector.data('validate-value') !== 'undefined' ? selector.data('validate-value') : selector.val();
+				return value ? false: true;
 			},
 			format: function(pattern) {
-				var matches = selector.val().match(pattern);
+				var value = typeof selector.data('validate-value') !== 'undefined' ? selector.data('validate-value') : selector.val(),
+					matches = value.match(pattern);
 				if (matches) {
 					return true;
 				}
 				return false;
 			},
 			message: function(message) {
-				if (selector.attr('type') == 'password') {
-					selector.attr('type', 'text');
-					selector.attr('orig_type', 'password');
-				}
 				selector.css(params.message.style);
+				selector.data('validate-value', selector.val());
 				selector.val(message);
 			},
-			checkEmpty: function(message) {
-				if (this.empty()) {
-					this.message(message);
-					return false;
+			resolve: function() {
+				selector.css(style);
+				if (typeof selector.data('validate-value') !== 'undefined') {
+					selector.val(selector.data('validate-value'));
+					selector.removeData('validate-value');
 				}
-				return true;
+			},
+			checkEmpty: function() {
+				selector.data('validate-legal', true);
+				if (this.empty()) {
+					if (typeof params.message.required === 'string') {
+						this.message(params.message.required);
+					}
+					selector.data('validate-legal', false);
+				}
 			},
 			checkFormat: function(pattern, message) {
+				selector.data('validate-legal', true);
+				if (typeof selector.data('validate-value') !== 'undefined') {
+					selector.val(selector.data('validate-value'));
+				}
+				
 				if (!this.format(pattern)) {
 					this.message(message);
-					return false;
+					selector.data('validate-legal', false);
 				}
-				return true;
 			}
 		};
 	};
 
-	function InputValidate() {
-		var selector = this;
-		if (selector.is('input')) {
-			var Valid = new Validate(selector);
+	function TextValidator(selector) {
+		var type = (typeof selector.data('validate-type') !== 'undefined') ? selector.data('validate-type') == 'text' : selector.is('input[type=text]');
+		if (type) {
+			var _parent = new Validator(selector); 
 			return {
+				resolve: function() {
+					_parent.resolve();
+				},
 				checkEmpty: function() {
-					return Valid.checkEmpty(params.message.required);
+					_parent.checkEmpty();
+					selector.blur();
+					selector
+					.on('focus', function() {
+						_parent.resolve();
+					});
+					return this;
 				},
 				checkFormat: function() {
-					var check_items = selector.data('check-item'),
-	                                    is_legal = true, pattern, message;
-
-					if (selector.attr('type') !== undefined) {
-                        pattern = params.format[selector.attr('type')];
-                        message = params.message.format[selector.attr('type')];
-                    }
-                        
-                    if (selector.data('check-item') !== undefined) {
-      		    		var type = selector.data('check-item').replace(/ /g, '');
-                        pattern = params.format[type];
-                        message = params.message.format[type];
-                    }
-                                     
-			        if (pattern instanceof RegExp && message !== undefined) {
-					    if (!Valid.checkFormat(pattern, message)) {
-							is_legal = false;
-					    }
+					if (params.format.text instanceof RegExp) {
+						var message = '';
+						if (typeof params.message.format.text === 'string') {
+							message = params.message.format.text;
+						}
+						_parent.checkFormat(params.format.text, message);
+						selector.blur();
+						selector.on('focus', function() {
+							_parent.resolve();
+						});
 					}
-				
-					return is_legal;
+					return this;
 				}
-			};
+			}
 		}
-		return false;
 	}
 
-	function SelectValidate() {
-		var selector = this;
+	function NumberValidator(selector) {
+		var type = (typeof selector.data('validate-type') !== 'undefined') ? selector.data('validate-type') == 'number' : selector.is('input[type=number]');
+		if (type) {
+			var _parent = new Validator(selector); 
+			return {
+				resolve: function() {
+					_parent.resolve();
+				},
+				checkEmpty: function() {
+					_parent.checkEmpty();
+					selector.blur();
+					selector
+					.on('focus', function() {
+						_parent.resolve();
+					});
+					return this;
+				},
+				checkFormat: function() {
+					if (params.format.number instanceof RegExp) {
+						var message = '';
+						if (typeof params.message.format.number === 'string') {
+							message = params.message.format.number;
+						}
+						_parent.checkFormat(params.format.number, message);
+						selector.blur();
+						selector.on('focus', function() {
+							_parent.resolve();
+						});
+					}
+					return this;
+				}
+			}
+		}
+	}
+
+	function EmailValidator(selector) {
+		var type = (typeof selector.data('validate-type') !== 'undefined') ? selector.data('validate-type') == 'email' : selector.is('input[type=email]');
+		if (type) {
+			var _parent = new Validator(selector); 
+			return {
+				resolve: function() {
+					_parent.resolve();
+				},
+				checkEmpty: function() {
+					_parent.checkEmpty();
+					selector.blur();
+					selector.on('focus', function() {
+						_parent.resolve();
+					});
+					return this;
+				},
+				checkFormat: function() {
+					if (params.format.email instanceof RegExp) {
+						var message = '';
+						if (typeof params.message.format.email === 'string') {
+							message = params.message.format.email;
+						}
+						_parent.checkFormat(params.format.email, message);
+						selector.blur();
+						selector.on('focus', function() {
+							_parent.resolve();
+						});
+					}
+					return this;
+				}
+			}
+		}
+	}
+
+	function PasswordValidator(selector) {
+		var type = (typeof selector.data('validate-type') !== 'undefined') ? selector.data('validate-type') == 'password' : selector.is('input[type=password]'),
+			style = selector.data('orig_css') ? selector.data('orig_css') : {}, 
+			_parent = new Validator(selector);
+
+		if (type) {
+			return {
+				message: function(message) {
+					selector.data('validate-type', 'password');
+					selector.attr('type', 'text');
+					selector.css(params.message.style);
+					selector.data('validate-value', selector.val());
+					selector.val(message);
+				},
+				resolve: function() {
+					selector.removeData('validate-type');
+					selector.attr('type', 'password');
+					selector.css(style);
+					if (typeof selector.data('validate-value') !== 'undefined') {
+						selector.val(selector.data('validate-value'));
+						selector.removeData('validate-value');
+					}
+				},
+				checkEmpty: function() {
+					var _this = this, message = '';
+					selector.data('validate-legal', true);
+					if (_parent.empty()) {
+						if (typeof params.message.required === 'string') {
+							message = params.message.required;
+						}
+						_this.message(params.message.required);
+						selector.blur();
+						selector.on('focus', function() {
+							_this.resolve();
+							selector.val('');
+						});
+						selector.data('validate-legal', false);
+					}
+				},
+				checkFormat: function() {
+					var _this = this, message = '';
+					selector.data('validate-legal', true);
+					if (params.format.password instanceof RegExp) {
+						if (typeof params.message.format.password === 'string') {
+							message = params.message.format.password;
+						}
+
+						if (!_parent.format(params.format.password)) {
+							_this.message(message);
+							selector.blur();
+							selector.on('focus', function() {
+								_this.resolve();
+								selector.val('');
+							});
+							selector.data('validate-legal', false);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	function SelectValidator(selector) {
 		if (selector.is('select')) {
-			var Valid = new Validate(selector);
+			var _parent = new Validator(selector);
 			return {
+				resolve: function() {
+					_parent.resolve();
+				},
 				checkEmpty: function() {
-					return Valid.checkEmpty();
+					_parent.checkEmpty();
+					selector.blur();
+					selector.on('focus', function() {
+						_parent.resolve();
+					});
+					return this;
 				},
 				checkFormat: function() {
 					console.error('Not support');
+					return this;
 				}
 			};
 		}
 	}
 
-	function RadioValidate() {
-		var selector = this;
+	function RadioValidator(selector) {
 		if (selector.is('input[type=radio]')) {
-			var Valid = new Validate(selector);
-			Valid.ptototype.empty = function() {
+			var _parent = new Validator(selector);
+			_parent.empty = function() {
 				var is_empty = true;
 				selector.each(function() {
 					if ($(this).prop('checked')) {
@@ -109,22 +261,29 @@
 				return is_empty;
 			};
 			return {
+				resolve: function() {
+					_parent.resolve();
+				},
 				checkEmpty: function() {
-					return Valid.checkEmpty();
+					_parent.checkEmpty();
+					selector.blur();
+					selector.on('focus', function() {
+						_parent.resolve();
+					});
+					return this;
 				},
 				checkFormat: function() {
 					console.error('Not support');
+					return this;
 				}
 			};
 		}
-		return false;
 	}
 
-	function CheckboxValidate() {
-		var selector = this;
+	function CheckboxValidator(selector) {
 		if (selector.is('input[type=checkbox]')) {
-			var Valid = new Validate(selector);
-			Valid.ptototype.empty = function() {
+			var _parent = new Validator(selector);
+			_parent.empty = function() {
 				var is_empty = true;
 				selector.each(function() {
 					if ($(this).prop('checked')) {
@@ -134,39 +293,56 @@
 				return is_empty;
 			};
 			return {
+				resolve: function() {
+					_parent.resolve();
+				},
 				checkEmpty: function() {
-					return Valid.checkEmpty();
+					_parent.checkEmpty();
+					selector.blur();
+					selector.on('focus', function() {
+						_parent.resolve();
+					});
+					return this;
 				},
 				checkFormat: function() {
 					console.error('Not support');
+					return this;
 				}
 			};
 		}
-		return false;
 	}
 
-	function TextAreaValidate() {
-		var selector = this;
+	function TextAreaValidator(selector) {
 		if (selector.is('textarea')) {
-			var Valid = new Validate(selector);
+			var _parent = new Validator(selector);
 			return {
+				resolve: function() {
+					_parent.resolve();
+				},
 				checkEmpty: function() {
-					return Valid.checkEmpty();
+					_parent.checkEmpty();
+					selector.blur();
+					selector.on('focus', function() {
+						_parent.resolve();
+					});
 				},
 				checkFormat: function() {
 					console.error('Not support');
+					return this;
 				}
 			};
 		}
-		return false;
 	}
 
-	var interFaceMap = {
-			'input' : InputValidate,
-			'textarea' : TextAreaValidate,
-			'select' : SelectValidate,
-			'checkbox' : CheckboxValidate,
-			'radio' : RadioValidate
+	var validators = {
+			TextValidator,
+			NumberValidator,
+			PasswordValidator,
+			EmailValidator,
+			TextAreaValidator,
+			SelectValidator,
+			CheckboxValidator,
+			RadioValidator,
 		},
 		params = {
 			format: {
@@ -204,63 +380,50 @@
 			$.extend(params.format, opt.format);
 		}
 
-		if (typeof opt.message.required == 'string') {
-			params.message.required = opt.message.required;
+		if (typeof opt.message === 'object') {
+			if (typeof opt.message.required == 'string') {
+				params.message.required = opt.message.required;
+			}
+
+			if (typeof opt.message.format === 'object') {
+				$.extend(params.message.format, opt.message.format);
+			}
+
+			if (typeof opt.message.style === 'object') {
+				$.extend(params.message.style, opt.message.style);
+			}
 		}
 
-		if (typeof opt.message.format === 'object') {
-			$.extend(params.message.format, opt.message.format);
-		}
-
-		if (typeof opt.message.style === 'object') {
-			$.extend(params.message.style, opt.message.style);
+		if (typeof opt.success === 'function') {
+			params.success = opt.success;
 		}
 
 		form.filter('form').submit(function(e) {
 			e.preventDefault();
 			form.find(elements.join(',')).each(function() {
-				var selector = $(this),
-					value = selector.val(),
-					type = selector.prop('tagName').toLowerCase(),
-					validator = (typeof interFaceMap[type] === 'function') ? interFaceMap[type].call(selector) : null,
-					css = {
-						backgroundColor: selector.css('backgroundColor'),
-						color: selector.css('color'),
-						borderColor: selector.css('borderColor')
-					};
-
-				if (validator !== null) {
-					if (selector.is('[required]') && !validator.checkEmpty()) {
-						selector.blur();
-						selector.off().on('focus', function(e) {
-							if (selector.attr('orig_type') == 'password') {
-								selector.attr('type', 'password');
-								selector.removeAttr('orig_type');
-							}
-							selector.data('is_legal', true);
-							selector.val(value);
-							selector.css(css);
-						});
-						selector.data('is_legal', false);
-					}
-
-					if (!validator.checkFormat()) {
-						selector.blur();
-						selector.off().on('focus', function(e) {
-							if (selector.attr('orig_type') == 'password') {
-								selector.attr('type', 'password');
-								selector.removeAttr('orig_type');
-							}
-							selector.data('is_legal', true);
-							selector.val(value);
-							selector.css(css);
-						});
-						selector.data('is_legal', false);
-					}
+				var selector = $(this), style = {};
+				if (typeof selector.data('orig_css') !== 'object') {
+					style.borderColor = selector.css('borderColor');
+					style.backgroundColor = selector.css('backgroundColor');
+					style.color = selector.css('color');
+					selector.data('orig_css', style);
 				}
 
-				if (selector.data('is_legal') == false) {
-					is_legal = false;
+				for (var i in validators) {
+					var validator = validators[i].call(null, selector);
+					if (typeof validator !== 'object') {
+						continue;
+					}
+
+					validator.resolve();
+					validator.checkEmpty();
+					if (selector.data('validate-legal')) {
+						validator.checkFormat();
+					}
+
+					if (!selector.data('validate-legal')) {
+						is_legal = false;
+					}
 				}
 			});
 
