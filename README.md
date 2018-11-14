@@ -1,5 +1,7 @@
 ## burendo-validator
 在表單(form)送出時，檢查表單上的欄位是否符合開發者訂定的規則
+## 前置安裝
+    
 ## 安裝
     npm install burendo-validator
     or
