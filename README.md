@@ -3,7 +3,7 @@
 ## 前置安裝
     jQuery
 ## 安裝
-```bash
+```sh
 npm install burendo-validator
 ```
 ```html
