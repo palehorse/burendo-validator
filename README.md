@@ -19,7 +19,9 @@
 * 僅限英數文字組合
 ## 欄位格式
 #### 必填欄位
+        ```html
 	<input type="text" name="name" required />
+	```
 #### Email
 	<input type="email" name="email" />
 #### 手機號碼
