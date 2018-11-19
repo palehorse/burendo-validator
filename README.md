@@ -7,7 +7,7 @@
 npm install burendo-validator
 ```
 ```html
-    <script src="burendo-validator/burendo-validator.jquery.js"></script>
+<script src="burendo-validator/burendo-validator.jquery.js"></script>
 ```
 #### Vue
 ```javascript
