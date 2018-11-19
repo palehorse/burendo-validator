@@ -66,29 +66,29 @@ $('.data-form').validate({
     format: {
 	password: /^[a-zA-Z0-9&\$\.]{8,16}$/,  //8~16位英數組合及限定符號
 	date: /^20\d{2}\-\d{1,2}\-\d{1,2}$/    //限制日期格式
-	}
+    }
 });
 ```
 #### 自訂訊息
 ```javascript
 $('.data-form').validate({
-	message: {
-		required: "必填欄位不可空白",
-		format: {
-			password: "須為8~16位英數組合及&、$、.",
-			date: "請輸入西元年月日，例如2018-9-20"
-		}
+    message: {
+	required: "必填欄位不可空白",
+	format: {
+	    password: "須為8~16位英數組合及&、$、.",
+	    date: "請輸入西元年月日，例如2018-9-20"
 	}
+    }
 });
 ```
 #### 驗證成功與失敗
 ```javascript
 $('.data-form').validate({
-	success: function() {
-	    //Do something when validating successfully
-	},
-	fail: function() {
-		//Handle the failure
-	}
+    success: function() {
+	//Do something when validating successfully
+    },
+    fail: function() {
+	//Handle the failure
+    }
 });
 ```
