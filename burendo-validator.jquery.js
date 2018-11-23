@@ -10,7 +10,7 @@
 
 		return {
 			empty: function() {
-				if (!selector.is('[required]')) {
+				if (!selector.is('[data-required-field]')) {
 					return false;
 				}
 				var value = typeof selector.data('validate-value') !== 'undefined' ? selector.data('validate-value') : selector.val();
@@ -241,7 +241,6 @@
 					return this;
 				},
 				checkFormat: function() {
-					console.error('Not support');
 					return this;
 				}
 			};
@@ -273,7 +272,6 @@
 					return this;
 				},
 				checkFormat: function() {
-					console.error('Not support');
 					return this;
 				}
 			};
@@ -305,7 +303,6 @@
 					return this;
 				},
 				checkFormat: function() {
-					console.error('Not support');
 					return this;
 				}
 			};
@@ -327,7 +324,6 @@
 					});
 				},
 				checkFormat: function() {
-					console.error('Not support');
 					return this;
 				}
 			};
