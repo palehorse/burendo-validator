@@ -5,10 +5,20 @@
 		factory(jQuery);
 	}
 })(function( $ ) {
+	var is_legal = true;
 	function Validator(selector) {
-		var style = selector.data('orig_css');
+		if (typeof selector.data('validator-ori-style') === 'undefined') {
+			selector.data('validator-ori-style', {
+				'border-color': selector.css('border-color'),
+				'background-color': selector.css('background-color'),
+				'color': selector.css('color'),
+			});
+		}
 
 		return {
+			fetchStyle: function() {
+				return style;
+			},
 			empty: function() {
 				if (!selector.is('[data-required-field]')) {
 					return false;
@@ -30,7 +40,10 @@
 				selector.val(message);
 			},
 			resolve: function() {
-				selector.css(style);
+				if (typeof selector.data('validator-ori-style') === 'object') {
+					selector.css(selector.data('validator-ori-style'));
+				}
+				
 				if (typeof selector.data('validate-value') !== 'undefined') {
 					selector.val(selector.data('validate-value'));
 					selector.removeData('validate-value');
@@ -165,8 +178,14 @@
 
 	function PasswordValidator(selector) {
 		var type = (typeof selector.data('validate-type') !== 'undefined') ? selector.data('validate-type') == 'password' : selector.is('input[type=password]'),
-			style = selector.data('orig_css') ? selector.data('orig_css') : {}, 
 			_parent = new Validator(selector);
+			if (typeof selector.data('validator-ori-style') === 'undefined') {
+			selector.data('validator-ori-style', {
+				'border-color': selector.css('border-color'),
+				'background-color': selector.css('background-color'),
+				'color': selector.css('color'),
+			});
+		}
 
 		if (type) {
 			return {
@@ -180,7 +199,10 @@
 				resolve: function() {
 					selector.removeData('validate-type');
 					selector.attr('type', 'password');
-					selector.css(style);
+					if (typeof selector.data('validator-ori-style') === 'object') {
+						selector.css(selector.data('validator-ori-style'));
+					}
+
 					if (typeof selector.data('validate-value') !== 'undefined') {
 						selector.val(selector.data('validate-value'));
 						selector.removeData('validate-value');
@@ -371,8 +393,7 @@
 		elements = ['input', 'textarea', 'select', 'radio', 'checkbox'];
 
 	$.fn.validate = function(opt) {
-		var form = this,
-			is_legal = true;
+		var form = this;
 
 		if (typeof opt === 'string') {
 			form.filter('form').find($(elements.join(',')).each(function() {
@@ -383,8 +404,10 @@
 						continue;
 					}
 
-					if (typeof validator[opt] === 'function') {
-						validator[opt].call();
+					switch (opt) {
+						case 'resolve':
+							validator[opt].call();
+						break;
 					}
 				}
 			}));
@@ -417,13 +440,7 @@
 			e.preventDefault();
 			is_legal = true;
 			form.find(elements.join(',')).each(function() {
-				var selector = $(this), style = {};
-				if (typeof selector.data('orig_css') !== 'object') {
-					style.borderColor = selector.css('borderColor');
-					style.backgroundColor = selector.css('backgroundColor');
-					style.color = selector.css('color');
-					selector.data('orig_css', style);
-				}
+				var selector = $(this);
 
 				for (var i in validators) {
 					var validator = validators[i].call(null, selector);
