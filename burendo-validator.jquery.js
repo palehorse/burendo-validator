@@ -374,6 +374,22 @@
 		var form = this,
 			is_legal = true;
 
+		if (typeof opt === 'string') {
+			form.filter('form').find($(elements.join(',')).each(function() {
+				var elm = $(this);
+				for (var i in validators) {
+					var validator = validators[i].call(null, elm);
+					if (typeof validator !== 'object') {
+						continue;
+					}
+
+					if (typeof validator[opt] === 'function') {
+						validator[opt].call();
+					}
+				}
+			}));
+		}
+
 		if (typeof opt.format === 'object') {
 			$.extend(params.format, opt.format);
 		}
