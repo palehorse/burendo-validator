@@ -388,6 +388,7 @@
 					}
 				}
 			}));
+			return false;
 		}
 
 		if (typeof opt.format === 'object') {
@@ -414,6 +415,7 @@
 
 		form.filter('form').submit(function(e) {
 			e.preventDefault();
+			is_legal = true;
 			form.find(elements.join(',')).each(function() {
 				var selector = $(this), style = {};
 				if (typeof selector.data('orig_css') !== 'object') {
