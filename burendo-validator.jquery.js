@@ -411,7 +411,7 @@
 					}
 				}
 			}));
-			return false;
+			return form;
 		}
 
 		if (typeof opt.format === 'object') {
@@ -470,5 +470,6 @@
 				form.off().submit();
 			}
 		});
+		return form;
 	};
 });
