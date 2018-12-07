@@ -436,7 +436,7 @@
 			params.success = opt.success;
 		}
 
-		form.filter('form').submit(function(e) {
+		form.filter('form').off().submit(function(e) {
 			e.preventDefault();
 			is_legal = true;
 			form.find(elements.join(',')).each(function() {
