@@ -29,9 +29,8 @@
 			format: function(pattern) {
 				var value = typeof selector.data('validate-value') !== 'undefined' ? selector.data('validate-value') : selector.val(),
 					matches = value.match(pattern);
-				if (matches) {
-					return true;
-				}
+				if (value == '') return true;
+				if (matches) return true;
 				return false;
 			},
 			message: function(message) {
@@ -73,9 +72,12 @@
 	};
 
 	function TextValidator(selector) {
-		var type = (typeof selector.data('validate-type') !== 'undefined') ? selector.data('validate-type') == 'text' : selector.is('input[type=text]');
-		if (type) {
-			var _parent = new Validator(selector); 
+		if (selector.is('input[type=text]')) {
+			var _parent = new Validator(selector),
+				type = selector.data('validate-type'),
+				format = typeof params.format[type] !== 'undefined' ? params.format[type] : null,
+				message = typeof params.message.format[type] === 'string' ? params.message.format[type] : null; 
+			
 			return {
 				resolve: function() {
 					_parent.resolve();
@@ -90,12 +92,8 @@
 					return this;
 				},
 				checkFormat: function() {
-					if (params.format.text instanceof RegExp) {
-						var message = '';
-						if (typeof params.message.format.text === 'string') {
-							message = params.message.format.text;
-						}
-						_parent.checkFormat(params.format.text, message);
+					if (format instanceof RegExp) {
+						_parent.checkFormat(format, message);
 						selector.blur();
 						selector.on('focus', function() {
 							_parent.resolve();
