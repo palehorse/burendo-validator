@@ -434,6 +434,7 @@
 			params.success = opt.success;
 		}
 
+		form.attr('novalidate', true);
 		form.filter('form').off().submit(function(e) {
 			e.preventDefault();
 			is_legal = true;
