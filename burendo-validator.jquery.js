@@ -412,26 +412,28 @@
 			return form;
 		}
 
-		if (typeof opt.format === 'object') {
-			$.extend(params.format, opt.format);
-		}
-
-		if (typeof opt.message === 'object') {
-			if (typeof opt.message.required == 'string') {
-				params.message.required = opt.message.required;
+		if (typeof opt === 'object') {
+			if (typeof opt.format === 'object') {
+				$.extend(params.format, opt.format);
 			}
 
-			if (typeof opt.message.format === 'object') {
-				$.extend(params.message.format, opt.message.format);
+			if (typeof opt.message === 'object') {
+				if (typeof opt.message.required == 'string') {
+					params.message.required = opt.message.required;
+				}
+
+				if (typeof opt.message.format === 'object') {
+					$.extend(params.message.format, opt.message.format);
+				}
+
+				if (typeof opt.message.style === 'object') {
+					$.extend(params.message.style, opt.message.style);
+				}
 			}
 
-			if (typeof opt.message.style === 'object') {
-				$.extend(params.message.style, opt.message.style);
+			if (typeof opt.success === 'function') {
+				params.success = opt.success;
 			}
-		}
-
-		if (typeof opt.success === 'function') {
-			params.success = opt.success;
 		}
 
 		form.attr('novalidate', true);
