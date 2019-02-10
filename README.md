@@ -35,11 +35,11 @@ require('burendo-validator/burendo-validator.jquery.js');
 ```
 #### 手機號碼
 ```html
-<input type="phone" name="phone" />
+<input type="text" name="phone" data-validate-type="phone" />
 ```
 #### 市內電話
 ```html
-<input type="tel" name="tel" />
+<input type="text" name="tel" data-validate-type="tel" />
 ```
 #### 密碼規則
 ```html
