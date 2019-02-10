@@ -27,7 +27,7 @@ require('burendo-validator/burendo-validator.jquery.js');
 ## 欄位格式
 #### 必填欄位
 ```html
-<input type="text" name="name" required />
+<input type="text" name="name" data-required-field />
 ```
 #### Email
 ```html
