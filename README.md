@@ -98,3 +98,7 @@ $('.data-form').validate({
     }
 });
 ```
+#### 讓錯誤訊息消失
+```javascript
+$('.data-form').validate('resolve');
+```
