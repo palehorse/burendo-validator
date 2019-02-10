@@ -15,6 +15,8 @@ npm install burendo-validator
 ```javascript
 require('burendo-validator/burendo-validator.jquery.js');
 ```
+## Demo
+[Demo on jsFiddle](https://jsfiddle.net/Palehorse/5a4y7n3t/32/)
 #### 支援的檢查規則
 * 必填欄位檢查
 * 電子郵件地址格式檢查
