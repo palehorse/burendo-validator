@@ -46,20 +46,20 @@ require('burendo-validator/burendo-validator.jquery.js');
 #### 密碼規則
 ```html
 <input type="password" name="password" /> <!-- 預設為6~12位英文數字組合 -->
-<input type="text" name="password" validate-type="password" />
+<input type="text" name="password" data-validate-type="password" />
 ```
 #### 僅限數字
 ```html
 <input type="number" name="stock" />
-<input type="number" name="stock" validate-type="number" />
+<input type="text" name="stock" data-validate-type="number" />
 ```
 #### 僅限英文字母
 ```html
-<input type="text" name="last_name" validate-type="alphabet" />
+<input type="text" name="last_name" data-validate-type="alphabet" />
 ```
 #### 僅限英數文字組合
 ```html
-<input type="text" name="username" validate-type="mix" />
+<input type="text" name="username" data-validate-type="mix" />
 ```
 ## 使用方法
 #### 基本用法
